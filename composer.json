@@ -24,11 +24,11 @@
   "autoload": {
     "psr-4": {
       "Kolter\\Comparator\\": "src/"
-    },
-    "autoload-dev": {
-      "psr-4": {
-        "Kolter\\Comparator\\Tests\\": "tests/"
-      }
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Kolter\\Comparator\\Tests\\": "tests/"
     }
   }
 }
