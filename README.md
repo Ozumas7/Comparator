@@ -20,14 +20,7 @@ Using [Composer](https://getcomposer.org/)
 ``` 
 composer require "kolter/comparator"
 ```
-**composer.json**
 
-```
-"require":
-{
-"kolter/{package}":"latest"
-}
-```
 
 
 
