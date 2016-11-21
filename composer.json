@@ -1,0 +1,34 @@
+{
+  "name": "kolter/comparator",
+  "description": "An abstraction of array sorting functions that ease the way to sort functions",
+  "keywords": [
+    "comparator",
+    "sort",
+    "array_sort",
+    "sort array"
+  ],
+  "homepage": "https://github.com/Ozumas7/comparator",
+  "license": "GPL-3.0",
+  "authors": [
+    {
+      "name": "Pablo Luna",
+      "email": "skyluna7@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0.9"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "5.5.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Kolter\\Comparator\\": "src/"
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "Kolter\\Comparator\\Tests\\": "tests/"
+      }
+    }
+  }
+}
