@@ -2,8 +2,6 @@
 
 namespace Kolter\Comparator;
 
-use Kolter\Comparator\Exceptions\NoSuchSorterFunctionFound;
-use Kolter\Comparator\Interfaces\Sorter;
 
 /**
  * Class Comparator
@@ -12,203 +10,85 @@ use Kolter\Comparator\Interfaces\Sorter;
 class Comparator
 {
     /**
-     * @var bool
-     */
-    private $mantainsKeyAssociation;
-
-    /**
-     * @var string
-     */
-    private $orderOfSort;
-
-    /**
      * @var array
      */
     private $array;
 
-    /**
-     * @var int
-     */
-    private $sortFlags;
-
-    /**
-     * @var
-     */
-    private $callable;
-
-    /**
-     * Comparator constructor.
-     * @param array $array
-     * @param bool $immutable
-     * @param int $sortFlags
-     */
-    public function __construct(array &$array, int $sortFlags = SORT_REGULAR)
+    public function __construct(array &$array)
     {
-        $this->sortBy = 'value';
-        $this->mantainsKeyAssociation = false;
-        $this->orderOfSort = 'ASC';
-        $this->sortFlags = $sortFlags;
         $this->array = &$array;
     }
 
-
-    /**
-     * @return $this
-     */
-    public function asc()
+    public function reverse()
     {
-        $this->orderOfSort = 'ASC';
+        array_reverse($this->array);
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function desc()
+    public function naturalSort(bool $caseInsensitive = false)
     {
-        $this->orderOfSort = 'DESC';
+        if ($caseInsensitive === false) {
+            natsort($this->array);
 
-        return $this;
-    }
-
-    public function regularSort()
-    {
-        $this->sortFlags = SORT_REGULAR;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function naturalSort()
-    {
-        $this->sortFlags = SORT_NATURAL;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function insensitiveSort()
-    {
-        $this->sortFlags = $this->sortFlags | SORT_FLAG_CASE;
-
-        return $this;
-    }
-
-    public function stringsSort()
-    {
-        $this->sortFlags = SORT_STRING;
-
-        return $this;
-    }
-
-    public function numbersSort()
-    {
-        $this->sortFlags = SORT_NUMERIC;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function keepKeys()
-    {
-        $this->mantainsKeyAssociation = true;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function noKeepKeys()
-    {
-        $this->mantainsKeyAssociation = false;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function byKeys()
-    {
-        $this->sortBy = 'key';
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function byValues()
-    {
-        $this->sortBy = 'value';
-
-        return $this;
-    }
-
-    /**
-     * @param callable|null $callable
-     * @return array
-     */
-    public function sort(callable $callback = null) : int
-    {
-        if (!is_null($callback)) {
-            $this->orderOfSort = 'USER';
-            $callable = $this->getSorter()->getCallable();
-
-            return $callable($this->array, $callback);
+            return $this;
         }
-        $callable = $this->getSorter()->getCallable();
+        natcasesort($this->array);
 
-        return $callable($this->array, $this->getSortFlags());
+        return $this;
+
     }
 
-    /**
-     * @return Sorter
-     * @throws NoSuchSorterFunctionFound
-     */
-    private function getSorter() : Sorter
+    public function shuffle()
     {
-        $sorterCollection = (new SorterCollection())->getSorterColleciton();
-        $result = null;
-        foreach ($sorterCollection as $key => $value) {
-            if ($value->getOrderOfSort() == $this->orderOfSort
-                && $value->getMantainsKeyAssociation() == $this->mantainsKeyAssociation
-                && $value->getSortBy() == $this->sortBy
-            ) {
-                $result = $value;
-                break;
-            }
+        shuffle($this->array);
+
+        return $this;
+    }
+
+    public function sortKeys(callable $callback = null, int $flags = SORT_REGULAR)
+    {
+        if (!$this->isAssoc()) return $this;
+
+        if ($callback === null) {
+            ksort($this->array, $flags);
+
+            return $this;
         }
-        if (is_null($result)) {
-            throw new NoSuchSorterFunctionFound();
+        if ($this->isAssoc()) {
+            uksort($this->array, $callback);
+
+            return $this;
         }
 
-        return $result;
+        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getSortFlags(): int
+    public function sort(callable $callback = null, int $flags = SORT_REGULAR)
     {
-        return $this->sortFlags;
+        if ($callback === null && !$this->isAssoc()) {
+            sort($this->array, $flags);
+
+            return $this;
+        }
+        if ($callback === null && $this->isAssoc()) {
+            asort($this->array, $flags);
+
+            return $this;
+        }
+        if ($this->isAssoc()) {
+            uasort($this->array, $callback);
+
+            return $this;
+        }
+        usort($this->array, $callback);
+
+        return $this;
     }
 
-    /**
-     * @param int $sortFlags
-     */
-    public function setSortFlags(int $sortFlags)
+    private function isAssoc()
     {
-        $this->sortFlags = $sortFlags;
+        return array_keys($this->array) !== range(0, count($this->array) - 1);
     }
-
 
 }
